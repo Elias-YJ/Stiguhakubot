@@ -1,7 +1,9 @@
 import util
 import os
 import logging
+import urllib.request
 import telegram.ext
+import time
 from telegram import ReplyKeyboardMarkup, InlineQueryResultCachedSticker, InlineQueryResultArticle, InputTextMessageContent
 from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler,
                           InlineQueryHandler, Filters)
@@ -34,6 +36,16 @@ def start(update, context):
         update.message.reply_text("You do not have editing permission. "
                                   "This is where permitted users would edit the database")
 
+def check_internet():
+    url="http://www.google.com/"
+    timeout=5
+    try:
+        urllib.request.urlopen(url, timeout=timeout)
+        print("Connection succesful")
+        return True
+    except:
+        print("No internet connection")
+        return False
 
 def edit(update, context):
     user: telegram.User = update.message.from_user
@@ -108,6 +120,10 @@ def inlinequery(update, context):
 
 
 def main():
+    print("Waiting for internet connection")
+    while not check_internet():
+        time.sleep(5)
+
     updater = telegram.ext.Updater(util.get_bot_token(), use_context=True)
 
     dp = updater.dispatcher
