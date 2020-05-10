@@ -64,6 +64,9 @@ class DatabaseEditor:
         except sqlite3.DatabaseError:
             return result
 
+        if len(result) > 40:
+            result = result[0:40]
+
         return result
 
     # Execute selected action (add or remove)
