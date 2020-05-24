@@ -1,8 +1,6 @@
 def get_bot_token():
-    text = open('token.txt', 'r')
-    token = text.readlines()[0]
-    token = token.strip(" \n")
-    text.close()
+    with open('token.txt', 'r') as token_file:
+        token = token_file.readlines()[0].strip(" \n")
     return token
 
 

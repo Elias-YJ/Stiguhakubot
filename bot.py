@@ -1,18 +1,15 @@
 import util
 import os
-import logging
 import urllib.request
 import telegram.ext
 import time
-from telegram import ReplyKeyboardMarkup, InlineQueryResultCachedSticker, InlineQueryResultArticle, InputTextMessageContent
+from telegram import ReplyKeyboardMarkup, InlineQueryResultCachedSticker, InlineQueryResultArticle, \
+    InputTextMessageContent
 from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler,
                           InlineQueryHandler, Filters)
 from database_tools import DatabaseEditor
 from uuid import uuid4
-
-# Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+from bot_log import Logger
 
 reply_keyboard = [['Add keyword', 'Remove keyword'],
                   ['Done']]
@@ -22,23 +19,27 @@ CHOOSING, SELECTING_STICKER, SELECTING_KEYWORD = range(3)
 
 parent_dir: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 database = os.path.join(parent_dir, 'Stiguhakubot_files', 'stickers.db')
+log_path = os.path.join(parent_dir, 'logs', 'stiguhakubot.log')
+
 db_editor = DatabaseEditor(database)
+logger = Logger(log_path).logger
 
 
 def start(update, context):
     user: telegram.User = update.message.from_user
     if util.is_user_permitted(user.id):
-        logging.info(user.full_name + " started the bot. User has editing permission")
+        logger.info(user.full_name + " started the bot. User has editing permission")
         update.message.reply_text("You have editing permissions. Use command /edit to "
                                   "add or remove keywords from the database")
     else:
-        logging.info(user.full_name + " started the bot")
+        logger.info(user.full_name + " started the bot")
         update.message.reply_text("You do not have editing permission. "
                                   "This is where permitted users would edit the database")
 
+
 def check_internet():
-    url="http://www.google.com/"
-    timeout=5
+    url = "http://www.google.com/"
+    timeout = 5
     try:
         urllib.request.urlopen(url, timeout=timeout)
         print("Connection succesful")
@@ -46,6 +47,7 @@ def check_internet():
     except:
         print("No internet connection")
         return False
+
 
 def edit(update, context):
     user: telegram.User = update.message.from_user
@@ -63,7 +65,7 @@ def info(update, context):
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    logging.warning('Update "%s" caused error "%s"', update, context.error)
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def add_keyword(update, context):
@@ -95,7 +97,7 @@ def select_sticker(update, context):
 def select_keyword(update, context):
     context.user_data["current_keyword"] = update.message.text
     result: str = db_editor.perform_action(context.user_data)
-    logging.info(update.message.from_user.full_name + " performed an edit operation")
+    logger.info(update.message.from_user.full_name + " performed an edit operation")
     update.message.reply_text("Selected keyword is \"{}\". {}"
                               "Choose next action or \"Done\" "
                               .format(update.message.text.lower(), result), reply_markup=markup)
