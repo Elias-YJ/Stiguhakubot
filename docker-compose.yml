@@ -1,0 +1,9 @@
+version: '3'
+services:
+  stiguhakubot:
+    build: .
+    volumes:
+      - ${DATABASE}:/bot/files:rw
+    environment:
+      - SUPER_ADMIN=${SUPER_ADMIN}
+      - BOT_TOKEN=${BOT_TOKEN}

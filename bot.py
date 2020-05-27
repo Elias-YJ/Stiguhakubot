@@ -17,12 +17,15 @@ markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 CHOOSING, SELECTING_STICKER, SELECTING_KEYWORD = range(3)
 
-parent_dir: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-database = os.path.join(parent_dir, 'Stiguhakubot_files', 'stickers.db')
-log_path = os.path.join(parent_dir, 'logs', 'stiguhakubot.log')
+database = os.path.join('files', 'stickers.db')
+log_path = os.path.join('files', 'logs', 'stiguhakubot.log')
 
 db_editor = DatabaseEditor(database)
 logger = Logger(log_path).logger
+
+logger.debug(os.getcwd())
+logger.debug(os.listdir())
+logger.debug(os.listdir('files'))
 
 
 def start(update, context):
